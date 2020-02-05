@@ -1,7 +1,14 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 
 const app = express()
 const PORT = process.env.PORT || 3001
+
+// Body parser
+// for json
+app.use(bodyParser.json())
+// for x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // Config
 const config = require('./config')
