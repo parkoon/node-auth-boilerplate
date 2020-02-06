@@ -41,8 +41,12 @@ router.post('/login', async (req, res) => {
 
         if (err) return res.status(401).json({ success: false, message: err })
 
+        // 토큰 발행
+        const token = await foundUser.generateToken()
+
         return res.json({
             success: true,
+            token
         })
     } catch (err) {
         console.error(err)

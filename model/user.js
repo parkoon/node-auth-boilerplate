@@ -1,8 +1,10 @@
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const saltRounds = 10
+const secretKey = 'q1w2e3#$%qw'
 
 const userSchema = new Schema({
     name: {
@@ -31,6 +33,12 @@ const userSchema = new Schema({
 })
 
 userSchema.pre('save', async function (next) {
+
+    // 패스워드를 새로 설정하지 않는다면 그냥 패스
+    // 이 부분이 없으면, 토큰을 생성하고 유저에 저장시킬 때
+    // 패스워드를 또 다시 암호화하는 이슈가 발생
+    if (!this.isModified('password')) next()
+
     try {
         const salt = await bcrypt.genSalt(saltRounds)
         const hash = await bcrypt.hash(this.password, salt)
@@ -55,8 +63,24 @@ userSchema.method('comparePassword', async function (password) {
         console.error(err)
         return Promise.reject({ err })
     }
+})
 
+userSchema.method('generateToken', async function () {
 
+    const user = this
+
+    // Signing a token with 1 hour of expiration:
+    const token = jwt.sign({
+        data: { _id: user._id, email: user.email }
+    }, secretKey, { expiresIn: '1h' })
+
+    user.token = token
+    try {
+        await user.save()
+        return Promise.resolve(token)
+    } catch (err) {
+        return Promise.reject(err)
+    }
 })
 const User = mongoose.model('User', userSchema)
 
