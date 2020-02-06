@@ -44,6 +44,9 @@ router.post('/login', async (req, res) => {
         // 토큰 발행
         const token = await foundUser.generateToken()
 
+        // security
+        // http://scottksmith.com/blog/2014/09/04/simple-steps-to-secure-your-express-node-application/
+        res.cookie('Authorization', token, { httpOnly: true })
         return res.json({
             success: true,
             token
