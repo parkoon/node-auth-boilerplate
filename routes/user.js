@@ -46,7 +46,8 @@ router.post('/login', async (req, res) => {
 
         return res.json({
             success: true,
-            token
+            token,
+            _id: foundUser._id
         })
     } catch (err) {
         console.error(err)
