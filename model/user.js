@@ -27,6 +27,15 @@ const userSchema = new Schema({
     }
 })
 
+// Don’t use arrow functions when you use Mongoose (Schema.method())
+// https://medium.com/@lucasdavidferrero/dont-use-arrow-functions-when-you-use-mongoose-schema-method-190b79f1640c
+userSchema.method('comparePassword', function (password) {
+    if (this.password === password) {
+        return Promise.resolve({ err: null })
+    }
+    return Promise.resolve({ err: '패스워드가 일치하지 않습니다' })
+
+})
 const User = mongoose.model('User', userSchema)
 
 module.exports = User
