@@ -44,6 +44,8 @@ router.post('/login', async (req, res) => {
         // 토큰 발행
         const token = await foundUser.generateToken()
 
+        res.cookie('Authorization', token, { httpOnly: true })
+
         return res.json({
             success: true,
             token,
