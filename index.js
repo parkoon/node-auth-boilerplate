@@ -4,6 +4,11 @@ const bodyParser = require('body-parser')
 const app = express()
 const PORT = process.env.PORT || 3001
 
+// Cookie Parser
+const cookieParser = require('cookie-parser')
+app.use(cookieParser());
+
+
 // Body parser
 // for json
 app.use(bodyParser.json())
