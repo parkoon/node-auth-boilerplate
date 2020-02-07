@@ -1,5 +1,6 @@
 const express = require('express')
 const Product = require('../model/product')
+const { auth } = require('../middleware/auth')
 const router = express.Router()
 
 // get all products
@@ -16,7 +17,7 @@ router.get('/', async (req, res) => {
 })
 
 // set product
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
 
     const product = new Product(req.body)
 

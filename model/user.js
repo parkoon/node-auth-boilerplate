@@ -82,6 +82,23 @@ userSchema.method('generateToken', async function () {
         return Promise.reject(err)
     }
 })
+
+userSchema.static('verifyToken', async function (token) {
+
+    try {
+        const decoded = await jwt.verify(token, secretKey)
+        const { data } = decoded
+        const foundUser = await this.findOne({ _id: data._id, token })
+
+        if (foundUser) return Promise.resolve()
+
+        return Promise.reject('권한이 없는 사용자 입니다.')
+
+    } catch (err) {
+        return Promise.reject(err)
+    }
+})
+
 const User = mongoose.model('User', userSchema)
 
 module.exports = User
