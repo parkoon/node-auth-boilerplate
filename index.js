@@ -2,12 +2,19 @@ const express = require('express')
 const bodyParser = require('body-parser')
 
 const app = express()
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3003
+
+// Morgan
+const morgan = require('morgan')
+app.use(morgan('dev'))
+
+// CORS
+const cors = require('cors')
+app.use(cors())
 
 // Cookie Parser
 const cookieParser = require('cookie-parser')
-app.use(cookieParser());
-
+app.use(cookieParser())
 
 // Body parser
 // for json
@@ -29,7 +36,6 @@ const productRouter = require('./routes/product')
 app.use('/api/v1/user', userRouter)
 app.use('/api/v1/product', productRouter)
 
-
 app.listen(PORT, () => {
-    console.log(`Server is running on ${PORT}`)
+  console.log(`Server is running on ${PORT}`)
 })

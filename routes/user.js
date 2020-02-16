@@ -4,57 +4,65 @@ const router = express.Router()
 // Model
 const User = require('../model/user')
 
+router.post('/regist', (req, res) => {
+  const user = new User(req.body)
 
-router.post('/regist', async (req, res) => {
-
-    const user = new User(req.body)
+  User.isExistedUser(req.body.email, async (err, existed) => {
+    if (existed)
+      return res
+        .status(400)
+        .json({ success: false, message: '이미 가입되어 있는 아이디 입니다.' })
 
     try {
-
-        const { _id, role, email, name } = await user.save()
-        res.status(200).json({
-            success: true,
-            user: {
-                _id, role, email, name
-            }
-        })
-
+      const { _id, role, email, name } = await user.save()
+      res.status(200).json({
+        success: true,
+        user: {
+          _id,
+          role,
+          email,
+          name,
+        },
+      })
     } catch (err) {
-
-        res.json({
-            success: false,
-            err
-        })
+      res.status(401).json({
+        success: false,
+        message: err,
+      })
     }
+  })
 })
 
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body
+  const { email, password } = req.body
+  console.log(email)
+  try {
+    // 이메일을 이용해 사용자를 찾고
+    const foundUser = await User.findOne({ email })
+    if (!foundUser)
+      return res
+        .status(401)
+        .json({ success: false, message: '이메일을 확인해주세요.' })
 
-    try {
-        // 이메일을 이용해 사용자를 찾고
-        const foundUser = await User.findOne({ email })
-        if (!foundUser) return res.status(401).json({ success: false, message: '이메일을 확인해주세요.' })
+    // 비밀번호가 일치하는지 체크
+    const { err } = await foundUser.comparePassword(password)
 
-        // 비밀번호가 일치하는지 체크
-        const { err } = await foundUser.comparePassword(password)
+    if (err) return res.status(401).json({ success: false, message: err })
 
-        if (err) return res.status(401).json({ success: false, message: err })
+    // 토큰 발행
+    const token = await foundUser.generateToken()
 
-        // 토큰 발행
-        const token = await foundUser.generateToken()
+    res.cookie('Authorization', token, { httpOnly: true })
 
-        res.cookie('Authorization', token, { httpOnly: true })
-
-        return res.json({
-            success: true,
-            token,
-            _id: foundUser._id
-        })
-    } catch (err) {
-        console.error(err)
-        res.status(500).json({ err })
-    }
+    return res.json({
+      success: true,
+      token,
+      _id: foundUser._id,
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ err })
+  }
 })
 
 module.exports = router
