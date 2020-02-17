@@ -31,10 +31,8 @@ createDatabase(config.MONGO_URI)
 
 // Router
 const userRouter = require('./routes/user')
-const productRouter = require('./routes/product')
 
 app.use('/api/v1/user', userRouter)
-app.use('/api/v1/product', productRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running on ${PORT}`)
