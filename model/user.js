@@ -64,11 +64,8 @@ userSchema.static('isExistedUser', async function(email, callback) {
   try {
     const foundUser = await this.findOne({ email })
 
-    console.log('================= LOG START ===================')
-    console.log(foundUser)
-    console.log('================= LOG END ===================')
-
     if (foundUser) return callback(null, true)
+
     return callback(null, false)
   } catch (err) {
     console.error(err)
@@ -80,13 +77,9 @@ userSchema.method('generateToken', async function() {
   const user = this
 
   // Signing a token with 1 hour of expiration:
-  const token = jwt.sign(
-    {
-      data: { _id: user._id, email: user.email },
-    },
-    secretKey,
-    { expiresIn: '1h' }
-  )
+  const token = jwt.sign({ _id: user._id, email: user.email }, secretKey, {
+    expiresIn: '1h',
+  })
 
   user.token = token
   try {

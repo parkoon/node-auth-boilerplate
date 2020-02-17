@@ -5,15 +5,17 @@ const router = express.Router()
 const User = require('../model/user')
 
 router.post('/regist', (req, res) => {
-  const user = new User(req.body)
+  const { email } = req.body
 
-  User.isExistedUser(req.body.email, async (err, existed) => {
+  User.isExistedUser(email, async (err, existed) => {
+    if (err) throw err
     if (existed)
       return res
         .status(400)
         .json({ success: false, message: '이미 가입되어 있는 아이디 입니다.' })
 
     try {
+      const user = new User(req.body)
       const { _id, role, email, name } = await user.save()
       res.status(200).json({
         success: true,
@@ -25,7 +27,8 @@ router.post('/regist', (req, res) => {
         },
       })
     } catch (err) {
-      res.status(401).json({
+      // server error
+      res.status(500).json({
         success: false,
         message: err,
       })
@@ -35,7 +38,7 @@ router.post('/regist', (req, res) => {
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body
-  console.log(email)
+
   try {
     // 이메일을 이용해 사용자를 찾고
     const foundUser = await User.findOne({ email })
@@ -57,7 +60,10 @@ router.post('/login', async (req, res) => {
     return res.json({
       success: true,
       token,
-      _id: foundUser._id,
+      user: {
+        _id: foundUser._id,
+        email: foundUser.email,
+      },
     })
   } catch (err) {
     console.error(err)
