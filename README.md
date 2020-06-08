@@ -1,4 +1,4 @@
-# Auth Boilerplate Base on Node (Express)
+# Auth Boilerplate Based on Node (Express)
 
 > 기본 인증 처리만 구현되어 있는 샘플 프로젝트
 
